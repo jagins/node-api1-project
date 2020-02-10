@@ -65,6 +65,34 @@ server.post('/api/users', (req, res) =>
     }
 })
 
+server.delete('/api/users/:id', (req, res) =>
+{
+    database.findById(req.params.id)
+    .then(user =>
+    {
+        if(!user)
+        {
+            res.status(404).json({message: 'The user with specified ID does not exist'});
+        }
+        else
+        {
+            database.remove(user.id)
+            .then(deletedUser =>
+            {
+                res.status(200).json({message: `${user.name} has been deleted from the database`});
+            })
+            .catch(error =>
+            {
+                res.status(500).json({message: 'The user could not be removed'});
+            })
+        }
+    })
+    .catch(error =>
+    {
+        res.status(500).json({errorMessage: 'The users information could not be retrieved.'});
+    })
+})
+
 const PORT = 5000;
 
 server.listen(PORT, () => console.log(`Server is working on localhost:${PORT}`));
