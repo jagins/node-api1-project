@@ -1,17 +1,26 @@
+//import express package
 const express = require('express');
+
+//import the database
 const database = require('./data/db');
 
+//create an express server
 const server = express();
 
+//body parser for json
 server.use(express.json());
 
+
+//route handler for the home page
 server.get('/', (req, res) =>
 {
     res.json({message: 'Its working!!'});
 })
 
+//route handler to get the list of users
 server.get('/api/users', (req, res) =>
 {
+    //list all users in the database
     database.find()
     .then(users =>
     {
@@ -23,17 +32,21 @@ server.get('/api/users', (req, res) =>
     })
 })
 
+//route handler to get user by id
 server.get('/api/users/:id', (req, res) =>
 {
+    //finds user by id in the database
     database.findById(req.params.id)
     .then(user =>
     {
+        //check to see if user is not in the database
         if(!user)
         {
             res.status(404).json({message: 'The user with that specified ID does not exist'});
         }
         else
         {
+            //send the response if user is in the database
             res.status(200).json(user);
         }
     })
@@ -45,14 +58,17 @@ server.get('/api/users/:id', (req, res) =>
 
 server.post('/api/users', (req, res) =>
 {
+    //make a copy of the request body
     const newUser = req.body;
 
+    //check to see if they have the proper fields
     if(!newUser.name || !newUser.bio)
     {
         res.status(400).json({errorMessage: 'Please provide name and bio for the user'});
     }
     else
     {
+        //if they have the proper fields add them to the database and return what the client sent
         database.insert(newUser)
         .then(user =>
         {
@@ -65,6 +81,7 @@ server.post('/api/users', (req, res) =>
     }
 })
 
+//route handler for delete a user
 server.delete('/api/users/:id', (req, res) =>
 {
     database.findById(req.params.id)
@@ -76,6 +93,7 @@ server.delete('/api/users/:id', (req, res) =>
         }
         else
         {
+            //if user is in the database remove them and return a message saying username has been deleted
             database.remove(user.id)
             .then(deletedUser =>
             {
@@ -93,6 +111,7 @@ server.delete('/api/users/:id', (req, res) =>
     })
 })
 
+//route handler for updating a user
 server.put('/api/users/:id', (req, res) =>
 {
     database.findById(req.params.id)
