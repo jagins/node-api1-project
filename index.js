@@ -10,7 +10,6 @@ const server = express();
 //body parser for json
 server.use(express.json());
 
-
 //route handler for the home page
 server.get('/', (req, res) =>
 {
